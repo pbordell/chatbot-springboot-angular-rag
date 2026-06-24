@@ -1,0 +1,21 @@
+# --- Configuración del IDE (IntelliJ / VSCode) ---
+.idea/
+*.iml
+*.iws
+.vscode/
+.DS_Store
+
+# --- Datos Persistentes de Docker (¡CRUCIAL IGNORAR!) ---
+pgvector_data/
+ollama_data/
+
+# --- Archivos de Sistema y Logs ---
+*.log
+.env
+
+# --- Dependencias de Node
+node_modules/
+
+# --- Caché y Compilación de Angular ---
+.angular/
+dist/

@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # 1. BASE DE DATOS VECTORIAL (PostgreSQL + Pgvector)
+  chatbot-db:
+    image: pgvector/pgvector:pg16
+    container_name: chatbot-vector-database
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: chatbot_vector_db
+      POSTGRES_USER: portfolio_user
+      POSTGRES_PASSWORD: portfolio_password
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    networks:
+      - chatbot-network
+    restart: unless-stopped
+
+  # 2. MOTOR DE IA LOCAL (Ollama)
+  ollama-service:
+    image: ollama/ollama:latest
+    container_name: ollama-ai
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Script para arrancar Ollama y descargar automáticamente el modelo de vectores ligero
+    entrypoint: [ "/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull all-minilm && tail -f /dev/null" ]
+    networks:
+      - chatbot-network
+    restart: unless-stopped
+
+  # 3. BACKEND (Spring Boot 3 + Spring AI)
+  chatbot-backend:
+    build: ./backend
+    container_name: chatbot-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://chatbot-db:5432/chatbot_vector_db
+      - SPRING_DATASOURCE_USERNAME=portfolio_user
+      - SPRING_DATASOURCE_PASSWORD=portfolio_password
+      - SPRING_AI_OLLAMA_BASE_URL=http://ollama-service:11434
+    depends_on:
+      - chatbot-db
+      - ollama-service
+    networks:
+      - chatbot-network
+    restart: unless-stopped
+
+  # 4. FRONTEND (Angular + Nginx)
+  chatbot-frontend:
+    build: ./frontend
+    container_name: chatbot-ui
+    ports:
+      - "4200:80" # Mapea el puerto 80 interno de Nginx al puerto 4200 de tu PC
+    depends_on:
+      - chatbot-backend
+    networks:
+      - chatbot-network
+    restart: unless-stopped
+
+# Volúmenes para asegurar la persistencia de los datos
+volumes:
+  pgvector_data:
+  ollama_data:
+
+# Red interna aislada para que los contenedores se hablen entre sí usando sus nombres de servicio
+networks:
+  chatbot-network:
+    driver: bridge
