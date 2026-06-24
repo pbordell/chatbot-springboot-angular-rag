@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import com.pbs.backend.utils.FilesUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,13 +35,14 @@ public class ChatController {
     }
   }
 
-  @GetMapping("/preguntar")
+  @GetMapping(path= "/preguntar", produces = MediaType.TEXT_PLAIN_VALUE)
   public ResponseEntity<String> procesarPregunta(@RequestParam String mensaje) {
     if (mensaje == null || mensaje.trim().isEmpty()) {
       return ResponseEntity.badRequest().body("El mensaje no puede estar vacío.");
     }
 
     String respuestaBot = chatService.buscarRespuestaSemantica(mensaje);
+    System.out.println("📤 Enviando respuesta a Angular: " + respuestaBot);
 
     return ResponseEntity.ok(respuestaBot);
   }

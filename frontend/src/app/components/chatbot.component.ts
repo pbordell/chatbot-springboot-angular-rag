@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../services/chat.service';
@@ -28,9 +28,8 @@ export class ChatbotComponent {
   mensajeIngesta: string = '';
   cargandoIngesta: boolean = false;
 
-  constructor(private chatService: ChatService) {}
+  constructor(private chatService: ChatService, private cdr: ChangeDetectorRef) {}
 
-  // --- LÓGICA DEL CHAT ---
   enviarPregunta() {
     if (!this.mensajeActual.trim() || this.cargandoBot) return;
 
@@ -43,13 +42,11 @@ export class ChatbotComponent {
       next: (respuesta) => {
         this.historialMensajes.push({ texto: respuesta, esUsuario: false });
         this.cargandoBot = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        this.historialMensajes.push({
-          texto: '❌ Error al conectar con el servidor de IA. Asegúrate de que el backend está corriendo.',
-          esUsuario: false
-        });
         this.cargandoBot = false;
+        this.cdr.detectChanges();
       }
     });
   }

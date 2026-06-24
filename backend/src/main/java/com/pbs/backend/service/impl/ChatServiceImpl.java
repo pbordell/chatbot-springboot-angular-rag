@@ -30,13 +30,12 @@ public class ChatServiceImpl implements ChatService {
     Document documentoOcasional = new Document(contenidoTexto);
 
     // 3. Lo fragmentamos de forma inteligente
-    TokenTextSplitter splitter =
-        TokenTextSplitter.builder()
-            .withChunkSize(800) // Tamaño objetivo del fragmento en tokens
-            .withMinChunkSizeChars(350) // Tamaño mínimo en caracteres
-            .withMinChunkLengthToEmbed(5) // Longitud mínima para ser vectorizado
-            .withMaxNumChunks(10000) // Límite máximo de fragmentos a generar
-            .withKeepSeparator(true) // Mantener separadores (ej: saltos de línea)
+    TokenTextSplitter splitter = TokenTextSplitter.builder()
+            .withChunkSize(100)
+            .withMinChunkSizeChars(50)
+            .withMinChunkLengthToEmbed(5)
+            .withMaxNumChunks(10000)
+            .withKeepSeparator(true)
             .build();
     List<Document> fragmentos = splitter.apply(List.of(documentoOcasional));
 
@@ -46,11 +45,10 @@ public class ChatServiceImpl implements ChatService {
 
   public String buscarRespuestaSemantica(String preguntaUsuario) {
     // 1. Construcción de la petición
-    SearchRequest peticionBusqueda =
-        SearchRequest.builder()
-            .query(preguntaUsuario) // La pregunta del usuario
-            .topK(1) // Traer solo el fragmento más relevante
-            .similarityThreshold(0.7) // FILTRO CRUCIAL: Umbral de similitud (70%)
+    SearchRequest peticionBusqueda = SearchRequest.builder()
+            .query(preguntaUsuario)
+            .topK(2)
+            .similarityThreshold(0.2)
             .build();
 
     // 2. Ejecución de la búsqueda semántica
