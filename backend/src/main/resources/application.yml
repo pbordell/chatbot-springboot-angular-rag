@@ -1,0 +1,19 @@
+spring:
+  # ==========================================
+  # 1. CONEXION A POSTGRESQL (Pgvector)
+  # ==========================================
+  datasource:
+    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:chatbot-db}:${SPRING_DATASOURCE_PORT:5432}/${SPRING_DATASOURCE_DB:chatbot_vector_db}
+    username: ${SPRING_DATASOURCE_USERNAME:portfolio_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:portfolio_password}
+    driver-class-name: org.postgresql.Driver
+
+  # ==========================================
+  # 2. CONEXION A OLLAMA (Motor de IA)
+  # ==========================================
+  ai:
+    ollama:
+      base-url: ${SPRING_AI_OLLAMA_BASE_URL:http://ollama-service:11434}
+      embedding:
+        options:
+          model: all-minilm
