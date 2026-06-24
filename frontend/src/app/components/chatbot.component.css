@@ -1,0 +1,159 @@
+.container-dashboard {
+  display: flex;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 40px auto;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  padding: 0 20px;
+}
+
+.chat-section {
+  flex: 2;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+}
+
+.chat-box {
+  flex: 1;
+  border: 1px solid #eef2f5;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.user-alignment {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.bot-bubble {
+  background: #e2e8f0;
+  color: #1e293b;
+  border-top-left-radius: 4px;
+}
+
+.user-bubble {
+  background: #2563eb;
+  color: #ffffff;
+  border-top-right-radius: 4px;
+}
+
+.typing {
+  font-style: italic;
+  color: #64748b;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+  font-size: 14px;
+}
+
+.input-area button {
+  padding: 0 20px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.admin-section {
+  flex: 1;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 25px;
+  height: fit-content;
+  border: 1px solid #e2e8f0;
+}
+
+.admin-desc {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.upload-box {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.btn-select {
+  display: block;
+  padding: 12px;
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  color: #475569;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-select:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.file-info {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.btn-ingesta {
+  width: 100%;
+  padding: 12px;
+  background: #059669;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-ingesta:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.status-message {
+  margin-top: 15px;
+  font-size: 13px;
+  padding: 10px;
+  border-radius: 6px;
+  background: #ffffff;
+  border-left: 4px solid #cbd5e1;
+}

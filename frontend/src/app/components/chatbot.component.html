@@ -1,0 +1,65 @@
+<div class="container-dashboard">
+
+  <!-- PANEL IZQUIERDO: CHATBOT INTERACTIVO -->
+  <div class="chat-section">
+    <h2>🤖 Base de Conocimiento IA</h2>
+
+    <div class="chat-box">
+      @for (msg of historialMensajes; track $index) {
+      <div class="message-wrapper" [ngClass]="{'user-alignment': msg.esUsuario}">
+        <div class="bubble" [ngClass]="msg.esUsuario ? 'user-bubble' : 'bot-bubble'">
+          {{ msg.texto }}
+        </div>
+      </div>
+      }
+
+      @if (cargandoBot) {
+      <div class="message-wrapper">
+        <div class="bubble bot-bubble typing">Pensando...</div>
+      </div>
+      }
+    </div>
+
+    <div class="input-area">
+      <input
+        type="text"
+        [(ngModel)]="mensajeActual"
+        (keyup.enter)="enviarPregunta()"
+        placeholder="Pregúntame sobre mi experiencia, tecnologías, contacto..."
+        [disabled]="cargandoBot">
+      <button (click)="enviarPregunta()" [disabled]="cargandoBot || !mensajeActual.trim()">Enviar</button>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO: PANEL DE INGESTA -->
+  <div class="admin-section">
+    <h3>📥 Alimentar Base de Datos Vectorial</h3>
+    <p class="admin-desc">Sube un nuevo archivo de texto para actualizar o añadir conocimiento al chatbot en tiempo real.</p>
+
+    <div class="upload-box">
+      <input
+        type="file"
+        id="fileInput"
+        (change)="onArchivoSeleccionado($event)"
+        accept=".txt"
+        style="display: none;">
+      <label for="fileInput" class="btn-select">Seleccionar archivo .txt</label>
+
+      @if (archivoSeleccionado) {
+      <div class="file-info">📄 {{ archivoSeleccionado.name }}</div>
+      }
+    </div>
+
+    <button
+      class="btn-ingesta"
+      (click)="ejecutarIngesta()"
+      [disabled]="cargandoIngesta || !archivoSeleccionado">
+      {{ cargandoIngesta ? 'Vectorizando...' : 'Iniciar Ingesta de Datos' }}
+    </button>
+
+    @if (mensajeIngesta) {
+    <div class="status-message">{{ mensajeIngesta }}</div>
+    }
+  </div>
+
+</div>
