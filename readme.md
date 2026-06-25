@@ -61,7 +61,9 @@ Sigue estos pasos en tu terminal para arrancar el proyecto:
 
 El proyecto está diseñado para ser totalmente autónomo. En la ruta `backend/src/main/resources/conocimiento.txt` puedes escribir tu biografía, experiencia, proyectos o habilidades en texto plano.
 
-Al ejecutar `docker-compose up`, un componente de Spring Boot (`ApplicationRunner`) leerá este archivo automáticamente, lo fragmentará y llamará a Ollama para guardarlo como vectores en la base de datos. **La búsqueda no es por palabras clave exactas, sino por similitud semántica (significado).**
+Una vez tengas levantada la apliación y hayas accedido al frontend, tendrás un botón en el apartado lateral para cargar el fichero y realizar la ingesta (puede tardar bastante). con eso ya podrás interactuar con el bot.
+
+Es posible que tengas que instalar manualmente el modelo Llama 3.2 dentro de un contenedor de Docker con este comando: docker exec -it ollama-ai ollama pull llama3.2
 
 ---
 
@@ -70,6 +72,5 @@ Al ejecutar `docker-compose up`, un componente de Spring Boot (`ApplicationRunne
 Este proyecto de portafolio demuestra conocimientos sólidos en:
 *   **Arquitectura de Software:** Separación de responsabilidades en capas (Client-Server Architecture).
 *   **Ingeniería de IA Moderna:** Implementación práctica de RAG, Vector Stores y Embeddings.
-*   **Ecosistema Java:** Uso avanzado de Spring Boot 3 y la nueva suite de Spring AI.
+*   **Ecosistema Java:** Uso avanzado de Spring Boot 4 y la nueva suite de Spring AI.
 *   **Desarrollo Frontend:** Creación de servicios reactivos y componentes en Angular.
-*   **Cultura DevOps:** Creación de redes entre contenedores, persistencia de volúmenes con Docker y optimización de imágenes mediante compilaciones multi-etapa (*Multi-stage builds*).
