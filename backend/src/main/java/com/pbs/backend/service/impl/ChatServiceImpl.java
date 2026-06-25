@@ -4,13 +4,12 @@ import com.pbs.backend.service.ChatService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,8 +18,7 @@ public class ChatServiceImpl implements ChatService {
 
   @Autowired private VectorStore vectorStore;
 
-  @Value("classpath:conocimiento.txt")
-  private Resource archivoConocimiento;
+  @Autowired private ChatModel chatModel;
 
   public void ingestarDocumentoManual(MultipartFile archivo) throws IOException {
     // 1. Extraemos el texto del archivo que subió el usuario
@@ -30,7 +28,8 @@ public class ChatServiceImpl implements ChatService {
     Document documentoOcasional = new Document(contenidoTexto);
 
     // 3. Lo fragmentamos de forma inteligente
-    TokenTextSplitter splitter = TokenTextSplitter.builder()
+    TokenTextSplitter splitter =
+        TokenTextSplitter.builder()
             .withChunkSize(100)
             .withMinChunkSizeChars(50)
             .withMinChunkLengthToEmbed(5)
@@ -44,21 +43,47 @@ public class ChatServiceImpl implements ChatService {
   }
 
   public String buscarRespuestaSemantica(String preguntaUsuario) {
-    // 1. Construcción de la petición
-    SearchRequest peticionBusqueda = SearchRequest.builder()
+    // 1. RECUPERACIÓN (R): Eliminamos el .similarityThreshold() para saltarnos el bug de Ollama con
+    // Spring AI
+    SearchRequest peticionBusqueda =
+        SearchRequest.builder()
             .query(preguntaUsuario)
             .topK(2)
-            .similarityThreshold(0.2)
             .build();
 
-    // 2. Ejecución de la búsqueda semántica
+    // 2. Ejecución de la búsqueda en la base de datos
     List<Document> documentosGanadores = vectorStore.similaritySearch(peticionBusqueda);
 
-    // 3. Extracción del resultado con seguridad
-    if (!documentosGanadores.isEmpty()) {
-      return documentosGanadores.get(0).getText();
+    // Si la base de datos está vacía porque nunca se hizo la ingesta manual
+    if (documentosGanadores.isEmpty()) {
+      return "Lo siento, la base de conocimiento está vacía. Por favor, sube tu archivo .txt desde el panel.";
     }
 
-    return "Lo siento, no encontré información relevante sobre esa pregunta en mi base de conocimiento.";
+    // Concatenamos el contenido de los dos fragmentos más relevantes recuperados de Postgres
+    StringBuilder contexto = new StringBuilder();
+    for (Document doc : documentosGanadores) {
+      contexto.append(doc.getText()).append("\n");
+    }
+
+    // 3. GENERACIÓN (G): Diseñamos el prompt definitivo para guiar el cerebro del LLM (llama3.2)
+    String instruccionesSystem =
+        """
+            Eres un asistente virtual experto para el portafolio profesional del desarrollador.
+            Tu trabajo es responder a las preguntas de los reclutadores usando ÚNICAMENTE el contexto provisto.
+            Responde de forma amable, fluida, natural y muy concisa en idioma Español.
+
+            REGLA CRUCIAL: Si la respuesta a la pregunta no se puede deducir usando el contexto de abajo, responde exactamente:
+            "Lo siento, no encontré información relevante sobre esa pregunta en mi base de conocimiento."
+
+            CONTEXTO RECUPERADO DE LA BASE DE DATOS:
+            %s
+
+            PREGUNTA DEL RECLUTADOR:
+            %s
+            """
+            .formatted(contexto.toString(), preguntaUsuario);
+
+    // 4. El LLM lee el currículum, procesa la pregunta y redacta la respuesta fina
+    return chatModel.call(instruccionesSystem);
   }
 }
